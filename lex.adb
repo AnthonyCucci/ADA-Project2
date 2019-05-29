@@ -19,7 +19,7 @@ procedure Lex is
 
   type Char_Type is (Beginsym, Progsym, Endsym, Decsym, Colon, Semicolon,
                      Comma, Typesym, Readsym, Writesym, Operator,
-                     Lparen, Rparen, Id, Nullsym);
+                     Lparen, Rparen, Id, Number, Nullsym);
 
   package Class_IO is new Ada.Text_IO.Enumeration_IO(Char_Type);
   use Class_IO;
@@ -54,6 +54,23 @@ procedure Lex is
          Text_IO.Create(File=>OutFile, Mode=>Text_IO.out_file, Name=>Argument(2));
       end If;
   END ReadFile;
+
+
+  --Name: Is_Numeric
+  --Description: Takes a string and returns wheter it is a number
+  --Parameters: String         Item: unknown Token - Input
+  --Return Value: True  -   Numeric
+  --              False -   Non-Numeric
+  --https://rosettacode.org/wiki/Determine_if_a_string_is_numeric#Ada
+  FUNCTION Is_Numeric (Item : in String) return Boolean is
+       Dummy : Float;
+    begin
+       Dummy := Float'Value (Item);
+       return True;
+    exception
+       when others =>
+          return False;
+  end Is_Numeric;
 
 
   --Name: ConvertToken
@@ -101,7 +118,11 @@ procedure Lex is
         elsif ((tokenStr =  " " ) or (tokenStr = "")) then
            Class := Nullsym;
         else
-           Class := id;
+           if (Is_Numeric(tokenStr)) then
+               Class := Number;
+           else
+               Class := id;
+           end if;
         end if;
      end if;
      WriteFile(outFile,Class);
